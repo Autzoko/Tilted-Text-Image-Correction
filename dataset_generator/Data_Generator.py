@@ -8,11 +8,12 @@ import re
 
 
 def read_resize(path, image_name, size=(400, 300)):
-	img = cv2.imread(path + image_name + '.png')
+	img = cv2.imread(path + image_name)
 	img = cv2.resize(img, size)
 
-	resized_name = image_name + '_resized.png'
-	cv2.imwrite(read_path + 'resized/' + resized_name, img)
+	_name = image_name.split('.')
+	pure_name = _name[0]
+	cv2.imwrite('./data/input/images/resized_images/resized_' + pure_name + '.png', img)
 
 
 def read_pointData(filepath):
@@ -87,14 +88,13 @@ def generate_dataset(resized_img_dir, point_data_path, num):
 
 if __name__ == '__main__':
 	point_data_path = './data/input/points/points_1.txt'
-	img_dir = './data/input/images/'
+	img_dir = './data/input/images/text_images/'
 	resized_img_dir = './data/input/images/resized_images/'
 
-	if(number_match(img_dir, point_data_path)):
-		print(read_pointData(point_data_path))
+	img_names = os.listdir(img_dir)
+	for img_name in img_names:
+		read_resize(img_dir, img_name)
 
-	else:
-		print("NUMBER OF IMAGES AND LENGTH OF POINTS SET DISMATCHED!\n")
 	
 
 		
