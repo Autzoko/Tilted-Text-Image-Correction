@@ -46,16 +46,56 @@ def number_match(img_dir, point_file):
 	else:
 		return False
 
+def read_images(dir, name):
+	img = cv2.imread(dir + name + '.png')
+	return img
+
+def rotate_image(img, points, range_start=-50, range_end=50):
+	rotated_points = []
+	for point in points:
+		rotated_points.append((point[0] + random.randint(range_start, range_end), point[1] + random.randint(range_start, range_end)))
+	
+	H = (np.float32(points), np.float32(rotated_points))
+	H_inverse = inv(H)
+
+	size = points[0].shape
+
+	warped_image = cv2.warpPerspective(img, H_inverse, size)
+
+	return warped_image, rotated_points
+
+
+def generate_dataset(resized_img_dir, point_data_path, num):
+	if(number_match(resized_img_dir, point_data_path)):
+		img_name_list = os.listdir(resized_img_dir)
+		warped_points_outfile = open('./data/out/points/warped_points.txt', 'a')
+		for img_name in img_name_list:
+			img = read_images(resized_img_dir, img_name)
+			points = read_pointData(point_data_path)
+
+			for i in range(num):
+				warped_img, rotated_points = rotate_image(img, points)
+				cv2.imwrite('./data/out/warped_images/' + 'warped_image_' + str(i) + '.png', warped_img)
+				points_string = str(rotated_points[0]) + ';' + str(rotated_points[1]) + ';' + str(rotated_points[2]) + ';' + str(rotated_points[3]) + '\n'
+				warped_points_outfile.write(points_string)
+
+
+
+
+
+
 
 if __name__ == '__main__':
 	point_data_path = './data/input/points/points_1.txt'
 	img_dir = './data/input/images/'
+	resized_img_dir = './data/input/images/resized_images/'
 
 	if(number_match(img_dir, point_data_path)):
 		print(read_pointData(point_data_path))
 
 	else:
 		print("NUMBER OF IMAGES AND LENGTH OF POINTS SET DISMATCHED!\n")
+	
 
 		
 
