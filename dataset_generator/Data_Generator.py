@@ -48,7 +48,7 @@ def number_match(img_dir, point_file):
 		return False
 
 def read_images(dir, name):
-	img = cv2.imread(dir + name + '.png')
+	img = cv2.imread(dir + name)
 	return img
 
 def rotate_image(img, points, range_start=-50, range_end=50):
