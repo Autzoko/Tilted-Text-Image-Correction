@@ -58,7 +58,7 @@ def rotate_image(img, points, range_start=-50, range_end=50):
 		rotated_points.append([point[0] + random.randint(range_start, range_end), point[1] + random.randint(range_start, range_end)])
 		points_list.append([point[0], point[1]])
 	
-	H = cv2.getPerspectiveTransform(np.array(points_list), np.array(rotated_points))
+	H = cv2.getPerspectiveTransform(np.array(points_list, dtype="float32"), np.array(rotated_points, dtype="float32"))
 
 
 	warped_image = cv2.warpPerspective(img, H, (400, 300))
@@ -70,15 +70,18 @@ def generate_dataset(resized_img_dir, point_data_path, num):
 	if(number_match(resized_img_dir, point_data_path)):
 		img_name_list = os.listdir(resized_img_dir)
 		warped_points_outfile = open('./data/out/points/warped_points.txt', 'a')
+		img_index = 0;
 		for img_name in img_name_list:
 			img = read_images(resized_img_dir, img_name)
 			points = read_pointData(point_data_path)
 
 			for i in range(num):
-				warped_img, rotated_points = rotate_image(img, points[i])
+				warped_img, rotated_points = rotate_image(img, points[img_index])
 				cv2.imwrite('./data/out/warped_images/' + 'warped_image_' + str(i) + '.png', warped_img)
 				points_string = str(rotated_points[0]) + ';' + str(rotated_points[1]) + ';' + str(rotated_points[2]) + ';' + str(rotated_points[3]) + '\n'
 				warped_points_outfile.write(points_string)
+			
+			img_index += 1
 
 
 
