@@ -66,16 +66,17 @@ def rotate_image(img, points, range_start=-50, range_end=50):
 	return warped_image, rotated_points
 
 
-def generate_dataset(resized_img_dir, point_data_path, num):
+def generate_dataset(resized_img_dir, point_data_path, num_per_img=50):
 	if(number_match(resized_img_dir, point_data_path)):
 		img_name_list = os.listdir(resized_img_dir)
 		warped_points_outfile = open('./data/out/points/warped_points.txt', 'a')
 		img_index = 0;
+		num = 0;
 		for img_name in img_name_list:
 			img = read_images(resized_img_dir, img_name)
 			points = read_pointData(point_data_path)
 
-			for i in range(num):
+			for i in range(num, num + num_per_img):
 				warped_img, rotated_points = rotate_image(img, points[img_index])
 				cv2.imwrite('./data/out/warped_images/' + 'warped_image_' + str(i) + '.png', warped_img)
 				points_string = str(rotated_points[0]) + ';' + str(rotated_points[1]) + ';' + str(rotated_points[2]) + ';' + str(rotated_points[3]) + '\n'
@@ -98,7 +99,7 @@ if __name__ == '__main__':
 	for img_name in img_names:
 		read_resize(img_dir, img_name)
 	
-	generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt', 50)
+	generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt')
 
 	
 
