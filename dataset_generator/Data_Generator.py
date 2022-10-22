@@ -88,6 +88,10 @@ def generate_dataset(resized_img_dir, point_data_path, num_per_img=50):
 			num += num_per_img
 			
 			img_index += 1
+		
+		return "Dataset generated!\n"
+	else:
+		return "Points data dismatch image number, please complete the data of resized image pivot points!\n"
 
 
 
@@ -104,7 +108,7 @@ if __name__ == '__main__':
 	for img_name in img_names:
 		read_resize(img_dir, img_name)
 	
-	generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt', num_per_img=1000)
+	print(generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt', num_per_img=1000))
 
 	
 
