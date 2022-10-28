@@ -69,7 +69,7 @@ def rotate_image(img, points, range_start=-50, range_end=50):
 	return warped_image, rotated_points
 
 
-def generate_dataset(resized_img_dir, point_data_path, num_per_img=50):
+def generate_dataset(resized_img_dir, point_data_path, num_per_img=50, adjust_bri=True):
 	if(number_match(resized_img_dir, point_data_path)):
 		img_name_list = os.listdir(resized_img_dir)
 		warped_points_outfile = open('./data/out/points/warped_points.txt', 'a')
@@ -81,7 +81,7 @@ def generate_dataset(resized_img_dir, point_data_path, num_per_img=50):
 
 			for i in range(num_per_img):
 				warped_img, rotated_points = rotate_image(img, points[img_index], range_start=-25, range_end=25)
-				cv2.imwrite('./data/out/warped_images/' + 'warped_image_' + str(num + i) + '.png', warped_img)
+				cv2.imwrite('./data/out/warped_images/' + str(num + i) + '.png', warped_img)
 				points_string = str(rotated_points[0]) + ';' + str(rotated_points[1]) + ';' + str(rotated_points[2]) + ';' + str(rotated_points[3]) + '\n'
 				warped_points_outfile.write(points_string)
 			
@@ -89,9 +89,28 @@ def generate_dataset(resized_img_dir, point_data_path, num_per_img=50):
 			
 			img_index += 1
 		
+		if(adjust_bri == True):
+			warped_img_name = os.listdir('./data/out/warped_images')
+			num = 0;
+			for warped_img in warped_img_name:
+				read_img = cv2.imread('./data/out/warped_images/' + warped_img, cv2.IMREAD_COLOR).astype(np.float32) / 255.0
+				tmp_img = adjust_brightness(read_img)
+				cv2.imwrite('./data/out/brightness/' + warped_img, tmp_img)
+				num += 1
+		
 		return "Dataset generated!\n"
 	else:
 		return "Points data dismatch image number, please complete the data of resized image pivot points!\n"
+
+
+def adjust_brightness(img):
+	brightness = random.randint(-25, 25)
+	hls_img = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
+	hls_img[:, :, 1] = (1.0 + brightness / float(100)) * hls_img[:, :, 1]
+	hls_img[:, :, 1][hls_img[:, :, 1] > 1] = 1
+	ls_img = cv2.cvtColor(hls_img, cv2.COLOR_HLS2BGR) * 255
+	ls_img = ls_img.astype(np.uint8)
+	return ls_img
 
 
 
@@ -103,12 +122,15 @@ if __name__ == '__main__':
 	point_data_path = './data/input/points/points_1.txt'
 	img_dir = './data/input/images/text_images/'
 	resized_img_dir = './data/input/images/resized_images/'
+	brightness_path = './data/out/brightness/'
 
 	img_names = os.listdir(img_dir)
 	for img_name in img_names:
 		read_resize(img_dir, img_name)
 	
-	print(generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt', num_per_img=1000))
+	print(generate_dataset('./data/input/images/resized_images/', './data/input/points/points_1.txt', num_per_img=100))
+
+
 
 	
 
